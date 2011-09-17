@@ -73,7 +73,7 @@ class ReferralUserRepository{
         return null;
     }
     
-    public static function save(\Linkamelo\Entity\ReferralUser $user)
+    public function save(\Linkamelo\Entity\ReferralUser $user)
     {
         //sad but it does nothing for now
         return null;

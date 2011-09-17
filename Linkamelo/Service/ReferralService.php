@@ -6,12 +6,19 @@ require_once __DIR__.'/../Repository/ReferralUserRepository.php';
 require_once __DIR__.'/../Repository/ObjectiveRepository.php';
 
 /**
- * Gestisce l'assegnazione dei punteggi quando un utenta raggiunge un obiettivo tremite referral
+ * Facade per tutte le operazioni
  *
  * @author micheleorselli
  */
 class ReferralService {
   
+  protected $db;
+  
+  public function __construct(\Doctrine\DBAL\Connection $db)
+  {
+    $this->db = $db;
+  }
+    
   /**
    * Registra il fatto che l'utente $email sul sito $site ha raggiunto l'obiettivo $objective_slug
    * aggiornando di conseguenza i punti 
@@ -23,7 +30,7 @@ class ReferralService {
    */
   public function userReachObjective($site, $email, $objective_slug)
   {   
-      $user_repo = new \Linkamelo\Repository\ReferralUserRepository();
+      $user_repo = new \Linkamelo\Repository\ReferralUserRepository($this->db);
       
       $user_referral = $user_repo->findBySiteAndEmail($site, $email)
                                  ->getReferredBy();
@@ -49,13 +56,13 @@ class ReferralService {
    */
   public function generateReferralLink($site, $email)
   {
-      $user_repo = new \Linkamelo\Repository\ReferralUserRepository();
+      $user_repo = new \Linkamelo\Repository\ReferralUserRepository($this->db);
       $user = $user_repo->findBySiteAndEmail($site, $email);
       
       if (!$user) {
         $user = new \Linkamelo\Entity\ReferralUser($email);
         $user->setSiteUrl($site);
-        \Linkamelo\Repository\ReferralUserRepository::save($user);
+        $user_repo->save($user);
       }
       
       return 'http://'.$site.'/user/register/'.$user->getReferralCode();
@@ -74,14 +81,14 @@ class ReferralService {
    */
   public function addReferral($site, $email, $referral)
   {
-      $user_repo = new \Linkamelo\Repository\ReferralUserRepository();
+      $user_repo = new \Linkamelo\Repository\ReferralUserRepository($this->db);
       $user = $user_repo->findBySiteAndEmail($site, $email);
       
       $user_ref = $user_repo->findByReferral($referral);
       
       $user->referredBy($user_ref);
       
-      \Linkamelo\Repository\ReferralUserRepository::save($user);
+      $user_repo->save($user);
       
       return $user_ref;
   }
