@@ -1,0 +1,1 @@
+CREATE  TABLE "main"."ReferralUser" ("id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "email" VARCHAR NOT NULL , "site_url" VARCHAR NOT NULL , "referral_code" VARCHAR NOT NULL  UNIQUE , "referred" INTEGER, "points" INTEGER NOT NULL )
